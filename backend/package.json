@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+		"deploy": "docker-compose --context futurepynk-box -f docker-compose.gcp.yml  up -d --remove-orphans"
   },
   "author": "",
   "license": "ISC",
