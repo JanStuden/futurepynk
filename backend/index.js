@@ -35,7 +35,10 @@ const initializeDatabase = async () => {
   // });
 };
 
+
+
 const initMongoose = async (mongoDbConnectionString) => {
+  console.log(mongoDbConnectionString);
   mongoose.connect(mongoDbConnectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
