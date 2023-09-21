@@ -3,6 +3,13 @@ import React from 'react';
 import { GoogleMap, LoadScript, Marker, HeatmapLayer } from '@react-google-maps/api';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import Slider from '@mui/material/Slider';
+
+
+
+
+
+
 
 const gradient = [
   "rgba(0, 255, 255, 0)",
@@ -31,9 +38,40 @@ const center = {
   lng: 9.9937,
 };
 
+const decisionTree = () =>{
+
+}
+
 function App() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSpotLng, setSelectedSpotLng] = useState();
+  const [selectedSpotLat, setSelectedSpotLat] = useState();
+  const [selectedSpotAddress, setSelectedSpotAddress] = useState();
+  const [time, setTime] = useState(0);
+
+  const handleSpotSelected = async (spot) => {
+    setSelectedSpotLng(spot[1]);
+    setSelectedSpotLat(spot[0]);
+    const apiKey = 'AIzaSyA3dDaBj1LBp_smJQqbICMH76Z5gUGLrtg';
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${spot[0]},${spot[1]}&key=${apiKey}`;
+
+    try {
+        // Make the HTTP GET request
+        const response = await fetch(url);
+        if (response.status === 200) {
+          const data = await response.json();
+          console.log(data);
+          const address = data.results[0].formatted_address;
+          setSelectedSpotAddress(address);
+        }
+        //
+        //
+    } catch (error) {
+        console.error(error);
+    }
+  };
+
 
   useEffect(() => {
     // Fetch data from the URL
@@ -62,6 +100,8 @@ function App() {
       });
   }, []);
 
+
+
   // Render loading indicator while data is being fetched
   if (loading) {
     return <div>Loading...</div>;
@@ -71,24 +111,45 @@ function App() {
   return (
     <div className="App">
       <LoadScript googleMapsApiKey="AIzaSyAGZoSeRrwH7zI9rR5OUxTGh--4ePQPItA" libraries={libraries}>
-        <Map center={center} />
+        <Map center={center} selectedSpot={selectedSpotLng} onSpotSelected={handleSpotSelected} />
         <HeatmapLayer
           gradient={gradient}
           data={data}
           opacity={1}
           radius={20}
         ></HeatmapLayer>
+        
       </LoadScript>
+      <Slider
+        aria-label="Temperature"
+        defaultValue={30}
+        valueLabelDisplay="auto"
+        step={1}
+        marks
+        min={10}
+        max={150}
+        onChange={(e) => {}}
+        
+      />
+      <p>Select street and see how speed adjustment might effect emissions: {selectedSpotAddress} </p>
     </div>
+    
   );
 }
 
-function Map({ center }) {
+function Map({ center, selectedSpot, onSpotSelected}) {
+  const mapStyles = {
+    opacity: 100
+  };
+
   return (
     <GoogleMap
+      id="map"
       mapContainerStyle={containerStyle}
       center={center}
       zoom={10}
+      onClick={(e) => {onSpotSelected([e.latLng.lat(), e.latLng.lng()])}}
+      
     >
       <Marker position={center} />
     </GoogleMap>
