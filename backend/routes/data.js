@@ -6,6 +6,7 @@ import fs from 'fs';
 import csv from 'csv-parser';
 import axios from 'axios';
 
+
 // Replace 'your.csv' with the path to your CSV file
 const csvFilePath = 'static_data.csv';
 const locationInfos = [];
@@ -155,33 +156,73 @@ const findBestRoute = async (req,res) => {
 	}
 	console.log(fastestRoute)
 	res.status(200).json(fastestRoute);
-
 }
 
 // find the data point (measurement) to a given coordinate
 // and return it as the pollution at the coordinate
-const calculatePolution = (step) => {
+const calculatePolution = async (req,res) => {
+	const jsonData = await fetch("https://patch-happy-vegetable.glitch.me/polutionData.json")
+	let data = await jsonData.json();
+	console.log(data)
 	let nearest_point = null;
 	let nearest_measurement = 100000;
+	let totalPolution = 0.0;
 	locationInfos.forEach((locationInfo) => { 
 		//get nearest point
 		let lng2 = locationInfo.geom.split('(')[1].split(' ')[0];
-			let lat2 = locationInfo.geom.split('(')[1].split(' ')[1].slice(0, -1);
-				let lat1 = step.start_location.lat;
-				let lng1 = step.start_location.lng;
-				let distance = calculateDistance(lat1, lng1, lat2, lng2);
-				if(distance < nearest_measurement) {
-					nearest_measurement = distance;
-					nearest_point = entry;
-				}
+		let lat2 = locationInfo.geom.split('(')[1].split(' ')[1].slice(0, -1);
+		let lat1 = req.params.lat;
+		let lng1 = req.params.lng;
+		let distance = calculateDistance(lat1, lng1, lat2, lng2);
+		if(distance < nearest_measurement) {
+			nearest_measurement = distance;
+			nearest_point = entry;
+		}
 	});
 
 			//query polution from latest datapoint
 			nearest_point = {"O3": 0.2, "CO2": 0.2, "NO2": 0.2, "NO": 0.2, "CO": 0.2};
 			for (const key in nearest_point) {
-				nearest_point[key] *= step.duration.value;
+				nearest_point[key] *= 30;
 			}
-		return nearest_point;
+			Object.values(nearest_point).forEach(value => {
+				totalPolution += value;
+			});
+			data.totalPolution += totalPolution;
+			data.CO2 += nearest_point.CO2;
+			data.NO2 += nearest_point.NO2;
+			data.NO += nearest_point.NO;
+			data.CO += nearest_point.CO;
+			data.O3 += nearest_point.O3;
+			console.log(data)
+
+			const dataToSend = ['Sample Data 1', 'Sample Data 2'];
+
+			fetch('https://script.google.com/macros/s/AKfycbzDYByYB7n4i_x-3dt59qBSsHLLYMDfRnTnq8GODzNenSLsD7qF00O284DkCtW5h0pCFA/exec', {
+			  method: 'POST',
+			  headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			  },
+			  body: 'data=' + JSON.stringify(dataToSend)
+			})
+			  .then(response => response.json())
+			  .then(data => {
+				console.log(data);
+				// Handle the response data as needed
+			  })
+			  .catch(error => {
+				console.error("Error sending data:", error);
+			  });
+			  fetch('https://script.google.com/macros/s/AKfycbzDYByYB7n4i_x-3dt59qBSsHLLYMDfRnTnq8GODzNenSLsD7qF00O284DkCtW5h0pCFA/exec')
+			  .then(response => response.json())
+			  .then(data => {
+				console.log(data);
+				// Handle the retrieved data as needed
+			  })
+			  .catch(error => {
+				console.error("Error fetching data:", error);
+			  });
+			res.status(200).json(data);
 	}
 
 
@@ -190,7 +231,7 @@ const router = express.Router();
 
 router.get("", getData);
 router.post("", pushData);
-router.get("/findBestRoute", findBestRoute);
+router.get("/calcPol", calculatePolution);
 
 
 export default router;

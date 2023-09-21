@@ -17,12 +17,20 @@ const gradient = [
   "rgba(191, 0, 31, 1)",
   "rgba(255, 0, 0, 1)"
 ];
-
+class NextComponent extends React.Component {
+  render() {
+    return (
+      <div className="next-component">
+        HELLO
+      </div>
+    );
+  }
+}
 class MapContainer extends React.Component {
   
   render() {
     return (
-      <div className="map-container">
+      <div>
         <Map
           google={this.props.google}
           className={"map"}
@@ -37,6 +45,7 @@ class MapContainer extends React.Component {
             radius={20}
           />
         </Map>
+        <NextComponent />
       </div>
     );
   }

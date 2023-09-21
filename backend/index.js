@@ -11,8 +11,8 @@ import ApplicationSettingsModel from "./model/ApplicationSettingsModel.js";
 import dotenv from "dotenv";
 
 // Load environment variables
-dotenv.config();
-
+//dotenv.config();
+/*
 const mongoDBConnectionSting = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_INITDB_DATABASE}?authSource=admin`;
 
 const initializeDatabase = async () => {
@@ -85,7 +85,7 @@ const initMongoose = async (mongoDbConnectionString) => {
     console.error("Error copying data:", error);
   }
 };
-
+*/
 const app = express();
 
 // define the port to run on
@@ -100,8 +100,8 @@ app.use(cors());
 app.use("/data", dataRouter);
 app.use("/datan", dataRouterN);
 
-console.log(mongoDBConnectionSting);
-initMongoose(mongoDBConnectionSting);
+//console.log(mongoDBConnectionSting);
+//initMongoose(mongoDBConnectionSting);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
