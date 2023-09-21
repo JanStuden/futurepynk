@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import Map from './Map';
+import Report from './Report'; // Import the Report component
 
-render(<Map center={{ lat: 53.5632388, lng: 9.9176227 }} zoom={11} />, document.getElementById('root'));
+render(
+  <div>
+    <Report />
+    <Map center={{ lat: 53.5823396, lng: 10.0791587 }} zoom={11} />
+  </div>, document.getElementById('root')
+);
