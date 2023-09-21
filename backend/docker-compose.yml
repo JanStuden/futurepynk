@@ -1,24 +1,5 @@
 version: "3.6"
 services:
-  node:
-    restart: always
-    depends_on:
-      - mongo
-    build: .
-    working_dir: /home/node/app
-    volumes:
-      - /opt/docker/futurepynk-backend/logs:/home/node/app/logs
-    ports:
-      - 8060:8060
-    environment:
-        PORT: 8060
-        NODE_ENV: production
-        MONGO_INITDB_ROOT_USERNAME:  ${MONGO_INITDB_ROOT_USERNAME}
-        MONGO_INITDB_ROOT_PASSWORD:  ${MONGO_INITDB_ROOT_PASSWORD}
-        MONGO_INITDB_DATABASE: futurepynk 
-        MONGO_HOST: mongo
-    env_file:
-      - ./.env.gcp
   mongo:
     image: mongo
     restart: always
