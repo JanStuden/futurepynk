@@ -6,12 +6,13 @@ services:
       - mongo
     build: .
     working_dir: /home/node/app
+    ports:
+      - 8060:8060
     volumes:
       - /opt/docker/futurepynk-backend/logs:/home/node/app/logs
-    ports:
-      - 80:80
+      - ./db:/data/db
     environment:
-        PORT: 80
+        PORT: 8060
         NODE_ENV: production
         MONGO_INITDB_ROOT_USERNAME:  ${MONGO_INITDB_ROOT_USERNAME}
         MONGO_INITDB_ROOT_PASSWORD:  ${MONGO_INITDB_ROOT_PASSWORD}

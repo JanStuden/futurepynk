@@ -1,15 +1,15 @@
 import express from "express";
 // import { handleData } from "../controllers/data.js";
+import RXEventModel from "../model/RXEventModel.js";
 
-
-const data = [];
-const pushData = (req, res) => {
-	data.push(req.body);
+const pushData = async (req, res) => {
+  await RXEventModel.create(req.body);
 	res.sendStatus(201);
 }
 
-const getData = (req, res) => {
-	res.json(data);
+const getData = async (req, res) => {
+	const events = await RXEventModel.find();
+	res.json(events);
 }
 
 const router = express.Router();

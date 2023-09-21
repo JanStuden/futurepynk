@@ -1,0 +1,13 @@
+version: '3.6'
+services:
+  nginx-futurepynk:
+    build: .
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+        - /etc/letsencrypt/archive/:/etc/letsencrypt/archive/
+        - /etc/letsencrypt/live/:/etc/letsencrypt/live
+        - ./letsencrypt/:/home/www/letsencrypt/
+    network_mode: host
