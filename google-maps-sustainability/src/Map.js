@@ -2,21 +2,22 @@ import React, { Component } from "react";
 import { Map, HeatMap, GoogleApiWrapper } from "google-maps-react";
 
 const gradient = [
-  "rgba(0, 255, 255, 0)",
-  "rgba(0, 255, 255, 1)",
-  "rgba(0, 191, 255, 1)",
-  "rgba(0, 127, 255, 1)",
-  "rgba(0, 63, 255, 1)",
-  "rgba(0, 0, 255, 1)",
-  "rgba(0, 0, 223, 1)",
-  "rgba(0, 0, 191, 1)",
-  "rgba(0, 0, 159, 1)",
-  "rgba(0, 0, 127, 1)",
-  "rgba(63, 0, 91, 1)",
-  "rgba(127, 0, 63, 1)",
-  "rgba(191, 0, 31, 1)",
-  "rgba(255, 0, 0, 1)"
+  "rgba(255, 182, 193, 0)",  // Pink
+  "rgba(255, 160, 180, 1)",
+  "rgba(255, 138, 167, 1)",
+  "rgba(255, 115, 155, 1)",
+  "rgba(255, 93, 142, 1)",
+  "rgba(255, 71, 130, 1)",
+  "rgba(255, 48, 117, 1)",
+  "rgba(255, 26, 105, 1)",
+  "rgba(255, 0, 92, 1)",
+  "rgba(235, 0, 82, 1)",
+  "rgba(215, 0, 71, 1)",
+  "rgba(194, 0, 61, 1)",
+  "rgba(174, 0, 50, 1)",
+  "rgba(154, 0, 39, 1)"    // Deep Red
 ];
+
 
 class MapContainer extends Component {
   constructor(props) {
@@ -102,7 +103,7 @@ class MapContainer extends Component {
           <HeatMap
             gradient={gradient}
             positions={processedData}
-            opacity={0.5}
+            opacity={5}
             radius={14}
           />
         </Map>
