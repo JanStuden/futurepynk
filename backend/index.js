@@ -9,13 +9,61 @@ import RXEventModel from "./model/RXEventModel.js";
 import RXEventModelNew from "./model/RXEventModelNew.js";
 import ApplicationSettingsModel from "./model/ApplicationSettingsModel.js";
 import dotenv from "dotenv";
+import fs from 'fs';
+import csv from 'csv-parser';
 
 // Load environment variables
 dotenv.config();
 
 const mongoDBConnectionSting = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_INITDB_DATABASE}?authSource=admin`;
 
+
+let currentWriteProcessRunning = false;
+const dataPointQueue = [];
+let addedElements = 0;
+const writeDataPointIntoMongo = async (dataPoint) => {
+  dataPointQueue.push(dataPoint);
+  if(currentWriteProcessRunning) {
+    return;
+  }
+  currentWriteProcessRunning = true;
+
+  while(dataPointQueue.length > 0 && addedElements > 30000) {
+    const elem = dataPointQueue.shift();
+    await RXEventModel.create(elem);
+  }
+
+  addedElements = addedElements + 1;
+  console.log(addedElements);
+  // Import Data
+  currentWriteProcessRunning = false;
+}
+
+
+const importAirtable = async (csvPath) => {
+  const rxEvents = await RXEventModel.find();
+  console.log(rxEvents.length);
+  if(rxEvents.length > 30000) {
+    console.log("We have enough rx events, dont import more");
+    return;
+  }
+
+  // Replace 'your.csv' with the path to your CSV file
+  const locationInfosCsvPath = 'static/dataPoints1.csv';
+
+  fs.createReadStream(locationInfosCsvPath)
+    .pipe(csv())
+    .on('data', async (dataPoint) => {
+        writeDataPointIntoMongo(dataPoint);
+    })
+}
+
+const mergeWithLocationInfos = () => {
+
+}
+
 const initializeDatabase = async () => {
+  
   // await RXEventModel.create({
   //   timestamp: "2022-11-01T06:25:08Z",
   //   latitude: 53.5451182100375,
@@ -54,7 +102,9 @@ const initMongoose = async (mongoDbConnectionString) => {
   if (!applicationSettingsModel) {
     console.log("Database not initialized. Initializing now.");
     await initializeDatabase();
+    await ApplicationSettingsModel.create({_id: "applicationSettings"});
   }
+  importAirtable();
 
   try {
     // 1. Retrieve all documents from the existing collection

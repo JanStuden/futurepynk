@@ -7,9 +7,9 @@ import csv from 'csv-parser';
 import axios from 'axios';
 
 // Replace 'your.csv' with the path to your CSV file
-const csvFilePath = 'static_data.csv';
+const locationInfosCsvPath = 'static/locationInfos.csv';
 const locationInfos = [];
-fs.createReadStream(csvFilePath)
+fs.createReadStream(locationInfosCsvPath)
   .pipe(csv())
   .on('data', (data) => {
   	locationInfos.push(data);
@@ -56,16 +56,6 @@ async function mapDatapointToStatic(datapoint) {
 
 	let closestLocationInfo = null;
 	const streetName = await getStreetName(lat, lng);
-
-
-  // Replace 'your.csv' with the path to your CSV file
-  const csvFilePath = 'static_data.csv';
-  const locationInfos = [];
-  fs.createReadStream(csvFilePath)
-	  .pipe(csv())
-	  .on('data', (data) => {
-	  	locationInfos.push(data);
-	  })
 	
 	let locationInfosInSameStreet = [];
 	locationInfos.forEach((locationInfo) => { if(locationInfo.osm_name===streetName.trim()) { locationInfosInSameStreet.push(locationInfo)} });
