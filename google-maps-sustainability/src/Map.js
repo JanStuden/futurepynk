@@ -18,9 +18,79 @@ const gradient = [
   "rgba(255, 0, 0, 1)"
 ];
 
-class MapContainer extends React.Component {
-  
+class MapContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      processedData: [], // Initialize as an empty array
+      isLoading: true, // Add a loading flag
+    };
+  }
+
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  async fetchData() {
+    try {
+      console.log("Started fetching...");
+      const response = await fetch("https://lite-air.app/backend/data");
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data (${response.status})`);
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      const processedDataArray = this.processData(data);
+
+      this.setState({ processedData: processedDataArray, isLoading: false }); // Set isLoading to false
+      console.log("Finished Transformation");
+      console.log(processedDataArray);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      this.setState({ isLoading: false }); // Set isLoading to false in case of an error
+    }
+  }
+
+  processData(data) {
+    return data.map(item => {
+      const weight = Object.keys(item)
+        .filter(key => key !== 'latitude' && key !== 'longitude')
+        .reduce((acc, key) => {
+          const value = parseFloat(item[key]);
+          if (!isNaN(value)) {
+            return acc + value;
+          }
+          return acc;
+        }, 0);
+
+      return {
+        lat: item.latitude,
+        lng: item.longitude,
+        weight: weight
+      };
+    });
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (!this.state.isLoading && nextState.isLoading) {
+      // Data has been loaded, trigger re-render
+      this.forceUpdate();
+    }
+  }
+
   render() {
+    const { processedData, isLoading } = this.state;
+    console.log("STATE", this.state);
+    console.log("!!!", processedData);
+
+    if (isLoading) {
+      // Display a loading message or spinner while data is being fetched
+      return <div>Loading...</div>;
+    }
+
     return (
       <div className="map-container">
         <Map
@@ -28,13 +98,12 @@ class MapContainer extends React.Component {
           className={"map"}
           zoom={this.props.zoom}
           initialCenter={this.props.center}
-          onReady={this.handleMapReady}
         >
           <HeatMap
             gradient={gradient}
-            positions={this.props.positions}
-            opacity={1}
-            radius={20}
+            positions={processedData}
+            opacity={0.5}
+            radius={14}
           />
         </Map>
       </div>

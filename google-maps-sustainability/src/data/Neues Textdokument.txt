@@ -1,0 +1,96 @@
+import React, { Component } from "react";
+import { Map, HeatMap, GoogleApiWrapper } from "google-maps-react";
+
+const gradient = [
+  "rgba(0, 255, 255, 0)",
+  "rgba(0, 255, 255, 1)",
+  "rgba(0, 191, 255, 1)",
+  "rgba(0, 127, 255, 1)",
+  "rgba(0, 63, 255, 1)",
+  "rgba(0, 0, 255, 1)",
+  "rgba(0, 0, 223, 1)",
+  "rgba(0, 0, 191, 1)",
+  "rgba(0, 0, 159, 1)",
+  "rgba(0, 0, 127, 1)",
+  "rgba(63, 0, 91, 1)",
+  "rgba(127, 0, 63, 1)",
+  "rgba(191, 0, 31, 1)",
+  "rgba(255, 0, 0, 1)"
+];
+
+class MapContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      processedData: [], // Initialize as an empty array
+    };
+  }
+
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData() {
+    console.log("Started fetching...")
+    fetch("https://lite-air.app/backend/data")
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        // Process the data as needed, assuming it's an array of objects similar to your previous data structure
+        const processedDataArray = data.map(item => {
+          // Process and calculate the weight for each item
+          // (similar to the previous processData function)
+          const weight = Object.keys(item)
+            .filter(key => key !== 'latitude' && key !== 'longitude')
+            .reduce((acc, key) => {
+              const value = parseFloat(item[key]);
+              if (!isNaN(value)) {
+                return acc + value;
+              }
+              return acc;
+            }, 0);
+
+          return {
+            lat: item.latitude,
+            lng: item.longitude,
+            weight: weight
+          };
+        });
+
+        this.setState({ processedData: processedDataArray });
+        console.log("Finished Transformation")
+        console.log(processedDataArray)
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error);
+      });
+  }
+
+  render() {
+    const { processedData } = this.state;
+    console.log("STATE", this.state)
+    console.log(processedData)
+    return (
+      <div className="map-container">
+        <Map
+          google={this.props.google}
+          className={"map"}
+          zoom={this.props.zoom}
+          initialCenter={this.props.center}
+        >
+          <HeatMap
+            gradient={gradient}
+            positions={processedData}
+            opacity={1}
+            radius={10}
+          />
+        </Map>
+      </div>
+    );
+  }
+}
+
+export default GoogleApiWrapper({
+  apiKey: "AIzaSyAGZoSeRrwH7zI9rR5OUxTGh--4ePQPItA",
+  libraries: ["visualization"]
+})(MapContainer);
