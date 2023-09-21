@@ -1,0 +1,50 @@
+version: "3.6"
+services:
+  node:
+    restart: always
+    depends_on:
+      - mongo
+    build: .
+    working_dir: /home/node/app
+    volumes:
+      - /opt/docker/futurepynk-backend/logs:/home/node/app/logs
+    ports:
+      - 8060:8060
+    environment:
+        PORT: 8060
+        NODE_ENV: production
+        MONGO_INITDB_ROOT_USERNAME:  ${MONGO_INITDB_ROOT_USERNAME}
+        MONGO_INITDB_ROOT_PASSWORD:  ${MONGO_INITDB_ROOT_PASSWORD}
+        MONGO_INITDB_DATABASE: futurepynk 
+        MONGO_HOST: mongo
+    env_file:
+      - ./.env.aws
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 8072:27017
+    # volumes:
+      # - ./db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+
+        #  mongo-express:
+        #    depends_on:
+        #    - mongo
+        #    image: mongo-express
+        #    restart: always
+        #    ports:
+        #      - 8071:8081
+        #    environment:
+        #      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_CONFIG_MONGODB_ADMINUSERNAME}
+        #      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_CONFIG_MONGODB_ADMINPASSWORD}
+        #      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME}
+        #      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD}
+        #      ME_CONFIG_MONGODB_SERVER: mongo
+
+networks:
+  default:
+    name: futurepynk 
