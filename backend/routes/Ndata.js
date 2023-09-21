@@ -1,6 +1,6 @@
 import express from "express";
 // import { handleData } from "../controllers/data.js";
-import RXEventModel from "../model/RXEventModel.js";
+import RXEventModelNew from "../model/RXEventModel.js";
 
 const pushData = async (req, res) => {
   await RXEventModelNew.create(req.body);

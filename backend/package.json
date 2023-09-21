@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon index.js",
-    "deploy": "docker-compose --context futurepynk-box -f docker-compose.gcp.yml  up -d --remove-orphans"
+    "deploy": "docker-compose --context futurepynk-box -f docker-compose.gcp.yml  up -d --remove-orphans --build"
   },
   "author": "",
   "license": "ISC",

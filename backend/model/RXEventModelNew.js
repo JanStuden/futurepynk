@@ -93,7 +93,7 @@ import mongoose, { Schema } from 'mongoose';
 //    "type": "FLOAT64"
 //  }
 //]
-const rxEventSchema = mongoose.Schema({
+const rxEventNewSchema = mongoose.Schema({
 	timestamp: Date,
 	latitude: Number,
 	longitude: Number,
@@ -111,4 +111,4 @@ const rxEventSchema = mongoose.Schema({
 	pm25_ugm3: Number,
 }, { timestamps: true });
 
-export default mongoose.model('RXEvent', rxEventSchema);
+export default mongoose.model('RXEventNew', rxEventNewSchema);

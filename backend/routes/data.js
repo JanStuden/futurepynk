@@ -10,7 +10,6 @@ import axios from 'axios';
 const csvFilePath = 'static_data.csv';
 
 const results = [];
-
 fs.createReadStream(csvFilePath)
   .pipe(csv())
   .on('data', (data) => {
@@ -27,7 +26,7 @@ const getData = async (req, res) => {
 	res.json(events);
 }
 
-async function mapDatapointToStatic(datapoint) {
+const mapDatapointToStatic = async (datapoint) => {
     const apiKey = 'AIzaSyA3dDaBj1LBp_smJQqbICMH76Z5gUGLrtg';
     const lng = datapoint.longitude;
     const lat = datapoint.latitude;
