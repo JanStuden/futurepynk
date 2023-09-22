@@ -23,6 +23,7 @@ const pushData = async (req, res) => {
 
 const getData = async (req, res) => {
 	const events = await RXEventModel.find();
+	console.log(events);
 	res.json(events);
 }
 
@@ -158,45 +159,129 @@ const findBestRoute = async (req,res) => {
 	res.status(200).json(fastestRoute);
 }
 
+const fetchLongLat = async () => {
+	let data = []
+	let reset = false;
+	fetch('https://script.google.com/macros/s/AKfycbxzxgSNnfDk4JCuewjv_fDKZAvqH0iELKenWuzUTXmHsVg9leH7ZIZZqV5eKWKsKI-l/exec')
+		.then(response => response.json())
+		.then(dataPoint => {
+			//console.log(data);
+			let lat = dataPoint.data[dataPoint.data.length-1][0]
+			let lng = dataPoint.data[dataPoint.data.length-1][1]
+			//console.log(lng, lat)
+			
+			if(lat!==0){
+				reset = false;
+				calculatePolution(lat, lng);
+			}
+			else{
+				
+				if(reset===false){
+					console.log("null")
+					reset = true;
+	fetch('https://script.google.com/macros/s/AKfycbzDYByYB7n4i_x-3dt59qBSsHLLYMDfRnTnq8GODzNenSLsD7qF00O284DkCtW5h0pCFA/exec')
+	.then(response => response.json())
+	.then(dataPoint => {
+		//console.log(dataPoint.data[dataPoint.data.length-1]);
+		
+		data[0] = dataPoint.data[dataPoint.data.length-1][0];
+		data[1]= dataPoint.data[dataPoint.data.length-1][1];
+		data[2] = dataPoint.data[dataPoint.data.length-1][2];
+		data[3] = dataPoint.data[dataPoint.data.length-1][3];
+		data[4] = dataPoint.data[dataPoint.data.length-1][4];
+		data[5] = dataPoint.data[dataPoint.data.length-1][5];
+		data[6] = dataPoint.data[dataPoint.data.length-1][6];
+		data[7] = 0.0;
+		data[8] = 0.0;
+		fetch('https://script.google.com/macros/s/AKfycbzDYByYB7n4i_x-3dt59qBSsHLLYMDfRnTnq8GODzNenSLsD7qF00O284DkCtW5h0pCFA/exec', {
+			method: 'POST',
+			headers: {
+			  'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			body: 'data=' + JSON.stringify(data)
+		  })
+			})
+		}
+			}
+		
+    // Handle the retrieved data as needed
+  })
+  .catch(error => {
+    console.error("Error fetching data:", error);
+  });
+}
 // find the data point (measurement) to a given coordinate
 // and return it as the pollution at the coordinate
-const calculatePolution = async (req,res) => {
-	const jsonData = await fetch("https://patch-happy-vegetable.glitch.me/polutionData.json")
-	let data = await jsonData.json();
-	console.log(data)
+const calculatePolution = async (lat5, lng5) => {
+	let data = {}
+	let lat1 = lat5;
+	let lng1 = lng5;
+	const response = await fetch("https://lite-air.app/backend/data");
+	const allDataPoints = await response.json();
+	//console.log(allDataPoints)
+
+	fetch('https://script.google.com/macros/s/AKfycbzDYByYB7n4i_x-3dt59qBSsHLLYMDfRnTnq8GODzNenSLsD7qF00O284DkCtW5h0pCFA/exec')
+	.then(response => response.json())
+	.then(dataPoint => {
+		//console.log(dataPoint.data[dataPoint.data.length-1]);
+		data.totalPolution = dataPoint.data[dataPoint.data.length-1][0];
+		data.CO2 = dataPoint.data[dataPoint.data.length-1][1];
+		data.NO2 = dataPoint.data[dataPoint.data.length-1][2];
+		data.NO = dataPoint.data[dataPoint.data.length-1][3];
+		data.CO = dataPoint.data[dataPoint.data.length-1][4];
+		data.O3 = dataPoint.data[dataPoint.data.length-1][5];
+		data.PM = dataPoint.data[dataPoint.data.length-1][6];
+		if(dataPoint.data[dataPoint.data.length-1][7]!==0){
+		data.id = dataPoint.data[dataPoint.data.length-1][7];
+		}
+		else{
+			console.log("hier")
+			data.id =Date.now();
+		}
+		data.tripPolution = dataPoint.data[dataPoint.data.length-1][8];
+	  // Handle the retrieved data as needed
+	
+	
 	let nearest_point = null;
-	let nearest_measurement = 100000;
+	let nearest_measurement = 1.200;
 	let totalPolution = 0.0;
-	locationInfos.forEach((locationInfo) => { 
+	allDataPoints.forEach((locationInfo) => { 
 		//get nearest point
-		let lng2 = locationInfo.geom.split('(')[1].split(' ')[0];
-		let lat2 = locationInfo.geom.split('(')[1].split(' ')[1].slice(0, -1);
-		let lat1 = req.params.lat;
-		let lng1 = req.params.lng;
+		let lng2 = locationInfo.longitude;
+		let lat2 = locationInfo.latitude;
+
 		let distance = calculateDistance(lat1, lng1, lat2, lng2);
 		if(distance < nearest_measurement) {
 			nearest_measurement = distance;
-			nearest_point = entry;
+			nearest_point = locationInfo;
 		}
 	});
-
+			console.log("nearestpoint", nearest_point)
 			//query polution from latest datapoint
-			nearest_point = {"O3": 0.2, "CO2": 0.2, "NO2": 0.2, "NO": 0.2, "CO": 0.2};
+
+			let all_pm = nearest_point.pmch1_perl+nearest_point.pmch2_perl+nearest_point.pmch3_perl+nearest_point.pmch4_perl+nearest_point.pmch5_perl+nearest_point.pmch6_perl;
+
+			nearest_point = {"O3": nearest_point.o3_ppb, "CO2": nearest_point.co2_ppm, "NO2": nearest_point.no2_ppb, "NO": nearest_point.no_ppb, "CO": nearest_point.co_ppm, "PM": all_pm};
 			for (const key in nearest_point) {
-				nearest_point[key] *= 30;
+				//console.log(nearest_point[key])
+				nearest_point[key] = (nearest_point[key]/1000000) * 3500;
 			}
 			Object.values(nearest_point).forEach(value => {
 				totalPolution += value;
+				
 			});
 			data.totalPolution += totalPolution;
+			data.tripPolution += totalPolution;
 			data.CO2 += nearest_point.CO2;
 			data.NO2 += nearest_point.NO2;
 			data.NO += nearest_point.NO;
 			data.CO += nearest_point.CO;
 			data.O3 += nearest_point.O3;
-			console.log(data)
-
-			const dataToSend = ['Sample Data 1', 'Sample Data 2'];
+			data.PM += nearest_point.PM;
+			//console.log(data)
+			console.log("nearest Point ", nearest_point)
+			const dataToSend = [data.totalPolution, data.CO2, data.NO2, data.NO, data.CO, data.O3, data.PM, data.id, data.tripPolution];
+			//console.log(dataToSend)
 
 			fetch('https://script.google.com/macros/s/AKfycbzDYByYB7n4i_x-3dt59qBSsHLLYMDfRnTnq8GODzNenSLsD7qF00O284DkCtW5h0pCFA/exec', {
 			  method: 'POST',
@@ -213,25 +298,26 @@ const calculatePolution = async (req,res) => {
 			  .catch(error => {
 				console.error("Error sending data:", error);
 			  });
-			  fetch('https://script.google.com/macros/s/AKfycbzDYByYB7n4i_x-3dt59qBSsHLLYMDfRnTnq8GODzNenSLsD7qF00O284DkCtW5h0pCFA/exec')
-			  .then(response => response.json())
-			  .then(data => {
-				console.log(data);
-				// Handle the retrieved data as needed
-			  })
-			  .catch(error => {
-				console.error("Error fetching data:", error);
-			  });
-			res.status(200).json(data);
+			 
+			//res.status(200).json(data);
+		})
+		.catch(error => {
+		  console.error("Error fetching data:", error);
+		});
 	}
 
+fetchLongLat();
 
+// Schedule fetchLongLat to run every 30 seconds
+const interval = 30 * 1000; // 30 seconds in milliseconds
+
+setInterval(fetchLongLat, interval);
 
 const router = express.Router();
 
 router.get("", getData);
 router.post("", pushData);
-router.get("/calcPol", calculatePolution);
+router.post("/calcPol", calculatePolution);
 
 
 export default router;
