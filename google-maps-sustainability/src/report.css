@@ -1,11 +1,26 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .report-container {
+  bottom: 0;
+  position: absolute; /* Set the container to relative positioning */
+  z-index: 1;
+  background-color: transparent;
   text-align: center;
   padding: 20px;
+  border-width: 1;
+  border-color: rgb(242, 34, 75);
 }
 
 .report-title {
   font-size: 24px;
   margin-bottom: 20px;
+  color: rgb(242, 34, 75);
 }
 
 .grid-container {
@@ -15,12 +30,13 @@
 }
 
 .grid-item {
-  background-color: #f0f0f0; /* Adjust background color as desired */
+  background-color: #f0f0f0a7;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid rgb(242, 34, 75);
   text-align: center;
   display: flex;
   flex-direction: column;
+  border-radius: 5px;
 }
 
 .grid-item-description {

@@ -28,7 +28,6 @@ class Report extends Component {
   render() {
     return (
       <div className="report-container">
-        <h2 className="report-title">Report Title</h2>
         <div className="grid-container">
           <div className='grid-item'>
             <div className='grid-item-description'>totalPolution</div>
