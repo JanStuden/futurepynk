@@ -132,7 +132,8 @@ const rxEventSchema = mongoose.Schema({
   pmch3_perl	: Number,
   pmch4_perl	: Number,
   pmch5_perl	: Number,
-  pmch6_perl	: Number
+  pmch6_perl	: Number,
+  closestLocationInfo: Object,
 }, { timestamps: true });
 
 export default mongoose.model('RXEvent', rxEventSchema);

@@ -16,7 +16,7 @@ fs.createReadStream(locationInfosCsvPath)
   })
 
 const pushData = async (req, res) => {
-	await RXEventModel.create(mapDatapointToStatic(req.body));
+	await RXEventModel.create(req.body);
 	res.sendStatus(201);
 }
 
@@ -25,82 +25,20 @@ const getData = async (req, res) => {
 	res.json(events);
 }
 
-const getStreetName = async (lat, lng)  => {
-	const apiKey = 'AIzaSyA3dDaBj1LBp_smJQqbICMH76Z5gUGLrtg';
-	const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-	
-	try {
-		const response = await fetch(url);
-
-		if(response.status !== 200) {
-			return null;
-		}
-
-		const data = await response.json();
-		const address = data.results[0].formatted_address;
-		const streetName = address.split(' ')[0];
-		
-		return streetName;
-	} catch (err) {
-		console.log(err);
-		return null;
-	}
-}
 
 
-// merge datapoint with closes location info
-async function mapDatapointToStatic(datapoint) {
-	const lng = datapoint.longitude;
-	const lat = datapoint.latitude;
-
-
-	let closestLocationInfo = null;
-	const streetName = await getStreetName(lat, lng);
-	
-	let locationInfosInSameStreet = [];
-	locationInfos.forEach((locationInfo) => { if(locationInfo.osm_name===streetName.trim()) { locationInfosInSameStreet.push(locationInfo)} });
-  
-	// Find the closest datapoint
-	let closestDistance = 1000000.0;
-	locationInfos.forEach((entry) => {
-		let lng2 = entry.geom.split('(')[1].split(' ')[0];
-		let lat2 = entry.geom.split('(')[1].split(' ')[1].slice(0, -1);
-		
-		const currentDistance = calculateDistance(lat, lng, lat2, lng2);
-		if (currentDistance < closestDistance) {
-			closestDistance = currentDistance;
-			closestLocationInfo = entry;
-		}
-	});
-
-	return { ...closestLocationInfo, ...datapoint };
-}
-
-const calculateDistance = (lat1, lon1, lat2, lon2) => {
-	// Convert latitude and longitude from degrees to radians
-	const radLat1 = (Math.PI * lat1) / 180;
-	const radLon1 = (Math.PI * lon1) / 180;
-	const radLat2 = (Math.PI * lat2) / 180;
-	const radLon2 = (Math.PI * lon2) / 180;
-
-	// Radius of the Earth in kilometers
-	const earthRadius = 6371; // Use 3959 for miles
-
-	// Haversine formula
-	const dLat = radLat2 - radLat1;
-	const dLon = radLon2 - radLon1;
-
-	const a =
-		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.cos(radLat1) * Math.cos(radLat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-	// Calculate the distance
-	const distance = earthRadius * c;
-
-	return distance;
-}
+const getLocationInfos = new Promise((resolve) => {
+	const locationInfoCsv = `static/locationInfos.csv`;
+	const locationInfos = [];
+	fs.createReadStream(locationInfoCsv)
+	  .pipe(csv())
+	  .on('data', async (locationInfo) => {
+		locationInfos.push(locationInfo);
+	  })
+	  .on('close', () => {
+		resolve(locationInfos);
+	  });
+  });
 
 // For a given origin and destination 
 // find the route with the lowest polution overall
@@ -118,12 +56,14 @@ const findBestRoute = async (req,res) => {
 		let route = data.routes[i];
 		let steps = route.legs[0].steps;
 
-		steps.forEach(step => {
-			let polution =  calculatePolution(step);
+		let currentStep = 0;
+		while(currentStep < steps) {
+			let polution = await calculatePolution(step);
 			for(const key in polution){
 				polutionCounter[key] += polution[key];
 			}
-		})
+			currentStep++;
+		}
 
 		let totalPolution = 0.0;
 
@@ -150,9 +90,10 @@ const findBestRoute = async (req,res) => {
 
 // find the data point (measurement) to a given coordinate
 // and return it as the pollution at the coordinate
-const calculatePolution = (step) => {
+const calculatePolution = async (step) => {
 	let nearest_point = null;
 	let nearest_measurement = 100000;
+	const locationInfos = await getLocationInfos();
 	locationInfos.forEach((locationInfo) => { 
 		//get nearest point
 		let lng2 = locationInfo.geom.split('(')[1].split(' ')[0];
@@ -162,7 +103,7 @@ const calculatePolution = (step) => {
 				let distance = calculateDistance(lat1, lng1, lat2, lng2);
 				if(distance < nearest_measurement) {
 					nearest_measurement = distance;
-					nearest_point = entry;
+					nearest_point = locationInfo;
 				}
 	});
 
