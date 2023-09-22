@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Map, HeatMap, GoogleApiWrapper } from "google-maps-react";
 import logo from './logo.png'; // Update the path to your image
-
+import Report from "./Report.jsx"
 const gradient = [
   "rgba(255, 182, 193, 0)",  // Pink
   "rgba(255, 160, 180, 1)",
@@ -23,11 +23,11 @@ const style = {
   height: "98vh",
   overflowX: "hidden",
   overflowY: "hidden",
- };
- const containerStyle = {
+};
+const containerStyle = {
   maxWidth: "99vw",
   height: "98vh",
- };
+};
 
 class MapContainer extends Component {
   constructor(props) {
@@ -104,10 +104,11 @@ class MapContainer extends Component {
 
     return (
       <div>
-            <img src={logo} alt="Your Image" style={{ width: "10%",   position: "absolute", right: 60, top: 10, zIndex: 3}}/>
+        <img src={logo} alt="Your Image" style={{ width: "10%", position: "absolute", right: 60, top: 10, zIndex: 3 }} />
+        <Report style={{ zIndex: 3, position: "absolute" }}></Report>
         <Map
-        style={style}
-        containerStyle={containerStyle}
+          style={style}
+          containerStyle={containerStyle}
           google={this.props.google}
           // className={"map"}
           zoom={this.props.zoom}

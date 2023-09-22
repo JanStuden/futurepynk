@@ -5,7 +5,7 @@ import Report from './Report'; // Import the Report component
 import "./wrapper.css"
 render(
     <div className='wrapper'>
-      <Report />
+      {/* <Report /> */}
       <Map center={{ lat: 53.5823396, lng: 10.0791587 }} zoom={11} />
     </div>
   , document.getElementById('root')
