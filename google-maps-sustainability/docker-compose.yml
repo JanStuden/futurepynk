@@ -1,0 +1,13 @@
+version: "3.6"
+
+services:
+  nginx-futurepynk:
+    restart: always
+    build: .
+    ports:
+      - 8085:80 
+
+networks:
+  default:
+    name: futurepynk 
+    external: true
