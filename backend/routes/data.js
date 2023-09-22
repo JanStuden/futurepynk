@@ -309,7 +309,7 @@ const calculatePolution = async (lat5, lng5) => {
 fetchLongLat();
 
 // Schedule fetchLongLat to run every 30 seconds
-const interval = 30 * 1000; // 30 seconds in milliseconds
+const interval = 10 * 1000; // 30 seconds in milliseconds
 
 setInterval(fetchLongLat, interval);
 

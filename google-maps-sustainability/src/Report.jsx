@@ -31,7 +31,7 @@ class Report extends Component {
     // Set up a timer to fetch data every minute
     this.timer = setInterval(() => {
       this.fetchData();
-    }, 30000); // 60000 milliseconds = 1 minute
+    }, 10000); // 60000 milliseconds = 1 minute
   }
 
   componentWillUnmount() {
@@ -83,45 +83,46 @@ class Report extends Component {
       <div className="report-container">
         <div className="grid-container">
           <div className='grid-item'>
-            <div className='grid-item-description'>totalPolution</div>
-            {this.state.totalPolution}ml
-          </div>
-          <div className='grid-item'>
-            <div className='grid-item-description'>tripPolution</div>
-            {this.state.tripPolution}ml
-          </div>
-          <div className='grid-item'>
-            <div className='grid-item-description'>tripID</div>
+            <div className='grid-item-description'>Trip ID</div>
             {this.state.tripID}
-          </div>
-          <div className='grid-item'>
-            <div className='grid-item-description'>totalCO2</div>
-            {this.state.totalCO2}ml
-          </div>
-          <div className='grid-item'>
-            <div className='grid-item-description'>totalNO2</div>
-            {this.state.totalNO2}ml
-          </div>
-          <div className='grid-item'>
-            <div className='grid-item-description'>totalCO</div>
-            {this.state.totalCO}ml
-          </div>
-          <div className='grid-item'>
-            <div className='grid-item-description'>totalPM</div>
-            {this.state.totalPM}µ
-          </div>
-          <div className='grid-item'>
-            <div className='grid-item-description'>totalO3</div>
-            {this.state.totalO3}ml
-          </div>
-          <div className='grid-item'>
-            <div className='grid-item-description'>totalNO</div>
-            {this.state.totalNO}ml
           </div>
           <div className='grid-item'>
             <div className='grid-item-description'>Trip Time</div>
             {(this.state.tripDuration/60000).toFixed(1)}min
           </div>
+          <div className='grid-item'>
+            <div className='grid-item-description'>Trip Polution</div>
+            {this.state.tripPolution}ml
+          </div>
+          <div className='grid-item'>
+            <div className='grid-item-description'>Total Polution</div>
+            {this.state.totalPolution}ml
+          </div>
+          <div className='grid-item'>
+            <div className='grid-item-description'>Total CO2</div>
+            {this.state.totalCO2}ml
+          </div>
+          <div className='grid-item'>
+            <div className='grid-item-description'>Total NO2</div>
+            {this.state.totalNO2}ml
+          </div>
+          <div className='grid-item'>
+            <div className='grid-item-description'>Total CO</div>
+            {this.state.totalCO}ml
+          </div>
+          <div className='grid-item'>
+            <div className='grid-item-description'>Total PM</div>
+            {this.state.totalPM}µ
+          </div>
+          <div className='grid-item'>
+            <div className='grid-item-description'>Total O3</div>
+            {this.state.totalO3}ml
+          </div>
+          <div className='grid-item'>
+            <div className='grid-item-description'>Total NO</div>
+            {this.state.totalNO}ml
+          </div>
+          
         </div>
       </div>
     );
