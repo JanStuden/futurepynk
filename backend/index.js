@@ -14,6 +14,7 @@ import csv from 'csv-parser';
 import fetch from "node-fetch";
 
 // Load environment variables
+/*
 dotenv.config();
 
 const mongoDBConnectionSting = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_INITDB_DATABASE}?authSource=admin`;
@@ -248,7 +249,7 @@ const initMongoose = async (mongoDbConnectionString) => {
     console.error("Error copying data:", error);
   }
 };
-
+*/
 const app = express();
 
 // define the port to run on
@@ -263,7 +264,7 @@ app.use(cors());
 app.use("/data", dataRouter);
 app.use("/datan", dataRouterN);
 
-initMongoose(mongoDBConnectionSting);
+//initMongoose(mongoDBConnectionSting);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
